@@ -1,0 +1,167 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: Arial, sans-serif;
+  height: 100%;
+  color: white;
+}
+
+/* Header */
+header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 20px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.logo {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.search-bar input {
+  padding: 8px;
+  border-radius: 20px;
+  border: none;
+  width: 250px;
+}
+
+.search-bar button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background-color: #007b7f;
+  color: white;
+  cursor: pointer;
+}
+
+.search-bar .clear {
+  background-color: #007b7f;
+}
+
+/* Hero Section */
+.hero {
+  height: 100vh;
+  background-image: "wallpaperflare.com_wallpaper.jpg"; /* Replace with your image */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 40, 50, 0.4);
+  display: flex;
+  justify-content: space-between;
+  padding: 60px 80px;
+  flex-wrap: wrap;
+}
+
+.main-text {
+  max-width: 600px;
+  margin-top: 100px;
+}
+
+.main-text h1 {
+  font-size: 3.5rem;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.main-text p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.book-btn {
+  padding: 12px 24px;
+  background-color: #00a79d;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Social Icons */
+.social-icons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  font-size: 1.5rem;
+}
+
+.social-icons a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .overlay {
+    flex-direction: column;
+    padding: 40px;
+    text-align: center;
+    align-items: center;
+  }
+
+  .main-text {
+    margin-top: 60px;
+  }
+
+  .main-text h1 {
+    font-size: 2.5rem;
+  }
+
+  .search-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+  }
+
+  .search-bar input {
+    width: 100%;
+  }
+
+  .search-bar button {
+    width: 100%;
+  }
+
+  .social-icons {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 20px;
+  }
+}
