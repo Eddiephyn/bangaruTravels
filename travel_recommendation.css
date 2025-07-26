@@ -8,6 +8,7 @@ body, html {
   font-family: Arial, sans-serif;
   height: 100%;
   color: white;
+  background-image: url("wallpaperflare.com_wallpaper.jpg");
 }
 
 /* Header */
@@ -68,7 +69,7 @@ nav a {
 /* Hero Section */
 .hero {
   height: 100vh;
-  background-image: "wallpaperflare.com_wallpaper.jpg"; /* Replace with your image */
+/* Replace with your image */
   background-size: cover;
   background-position: center;
   position: relative;
