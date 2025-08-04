@@ -1,17 +1,14 @@
-// Main JavaScript file for TravelBloom website
-// Handles functionality for Home, About, and Contact pages
+// Detect current page
+function getCurrentPage() {
+    const path = window.location.pathname;
+    if (path.includes('about.html')) return 'about';
+    if (path.includes('contact.html')) return 'contact';
+    if (path.includes('recommendations.html')) return 'recommendations';
+    return 'home';
+}
 
+// Initialize page when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the application
-    initializeApp();
-});
-
-function initializeApp() {
-    // Common functionality for all pages
-    initializeNavigation();
-    initializeSocialLinks();
-    
-    // Page-specific functionality
     const currentPage = getCurrentPage();
     
     switch(currentPage) {
@@ -24,204 +21,586 @@ function initializeApp() {
         case 'contact':
             initializeContactPage();
             break;
+        case 'recommendations':
+            initializeRecommendationsPage();
+            break;
     }
-}
-
-// Utility function to determine current page
-function getCurrentPage() {
-    const path = window.location.pathname;
-    const page = path.split('/').pop().split('.')[0];
-    
-    if (page === 'index' || page === '' || page === '/') {
-        return 'home';
-    } else if (page === 'about') {
-        return 'about';
-    } else if (page === 'contact') {
-        return 'contact';
-    }
-    return 'home'; // default
-}
-
-// ===== COMMON FUNCTIONALITY =====
-
-// Navigation functionality
-function initializeNavigation() {
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            // Remove active class from all links
-            navLinks.forEach(l => l.classList.remove('active'));
-            // Add active class to clicked link
-            this.classList.add('active');
-        });
-    });
-    
-    // Mobile navigation toggle (if needed)
-    const navbar = document.querySelector('.navbar');
-    let isScrolled = false;
-    
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 50 && !isScrolled) {
-            navbar.style.background = 'rgba(45, 55, 65, 0.6)';
-            isScrolled = true;
-        } else if (window.scrollY <= 50 && isScrolled) {
-            navbar.style.background = 'rgba(45, 55, 65, 0.4)';
-            isScrolled = false;
-        }
-    });
-}
-
-// Social media links functionality
-function initializeSocialLinks() {
-    const socialLinks = document.querySelectorAll('.social-link');
-    
-    socialLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Add click animation
-            this.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 150);
-            
-            // You can add actual social media URLs here
-            const platform = getSocialPlatform(this);
-            console.log(`Navigating to ${platform} social media page...`);
-            
-            // Example: window.open('https://twitter.com/yourhandle', '_blank');
-        });
-    });
-}
-
-function getSocialPlatform(element) {
-    const svg = element.querySelector('svg path');
-    if (!svg) return 'unknown';
-    
-    const pathData = svg.getAttribute('d');
-    if (pathData.includes('23.953')) return 'Twitter';
-    if (pathData.includes('24 12.073')) return 'Facebook';
-    if (pathData.includes('12 2.163')) return 'Instagram';
-    if (pathData.includes('23.498')) return 'YouTube';
-    return 'Social Media';
-}
-
-// ===== HOME PAGE FUNCTIONALITY =====
+});
 
 function initializeHomePage() {
-    initializeSearch();
-    initializeBookButton();
-    initializeHeroAnimations();
+    console.log('Home page initialized');
+    initializeSearchFunctionality();
 }
 
-function initializeSearch() {
-    const searchInput = document.querySelector('.search-input');
+function initializeAboutPage() {
+    console.log('About page initialized');
+}
+
+function initializeContactPage() {
+    console.log('Contact page initialized');
+}
+
+function initializeSearchFunctionality() {
     const searchBtn = document.querySelector('.search-btn');
+    const searchInput = document.querySelector('.search-input');
     const clearBtn = document.querySelector('.clear-btn');
     const searchError = document.querySelector('.search-error');
     
-    if (!searchInput || !searchBtn || !clearBtn) return;
-    
-    // Search functionality
-    searchBtn.addEventListener('click', performSearch);
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            performSearch();
-        }
-    });
-    
-    // Clear functionality
-    clearBtn.addEventListener('click', function() {
-        searchInput.value = '';
-        hideSearchError();
-        searchInput.focus();
-    });
-    
-    // Real-time validation
-    searchInput.addEventListener('input', function() {
-        hideSearchError();
-    });
-    
-    function performSearch() {
-        const query = searchInput.value.trim();
+    if (searchBtn && searchInput) {
+        searchBtn.addEventListener('click', function() {
+            const query = searchInput.value.trim();
+            if (query) {
+                // Show recommendations section on same page
+                showRecommendations(query);
+            } else {
+                showSearchError();
+            }
+        });
         
-        if (!query) {
-            showSearchError('Please enter a valid search query.');
-            return;
-        }
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query) {
+                    showRecommendations(query);
+                } else {
+                    showSearchError();
+                }
+            }
+        });
         
-        if (query.length < 2) {
-            showSearchError('Search query must be at least 2 characters long.');
-            return;
-        }
-        
-        // Simulate search functionality
-        console.log(`Searching for: ${query}`);
-        
-        // Add loading state
-        searchBtn.disabled = true;
-        searchBtn.textContent = 'Searching...';
-        
-        // Simulate API call
-        setTimeout(() => {
-            searchBtn.disabled = false;
-            searchBtn.textContent = 'Search';
-            
-            // Show success message (you can customize this)
-            showSearchSuccess(`Found results for "${query}"`);
-            
-            // Here you would typically redirect to search results page
-            // window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
-        }, 1500);
+        // Hide error when user types
+        searchInput.addEventListener('input', function() {
+            if (searchError) {
+                searchError.style.display = 'none';
+            }
+        });
     }
     
-    function showSearchError(message) {
-        searchError.textContent = message;
-        searchError.style.display = 'block';
-        searchError.style.color = '#FF5252';
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            if (searchError) {
+                searchError.style.display = 'none';
+            }
+            hideRecommendations();
+        });
     }
-    
-    function showSearchSuccess(message) {
-        searchError.textContent = message;
+}
+
+function showSearchError() {
+    const searchError = document.querySelector('.search-error');
+    if (searchError) {
         searchError.style.display = 'block';
-        searchError.style.color = '#4CAF50';
-        
         setTimeout(() => {
-            hideSearchError();
+            searchError.style.display = 'none';
         }, 3000);
     }
-    
-    function hideSearchError() {
-        searchError.style.display = 'none';
+}
+
+function showRecommendations(query) {
+    const recommendationsSection = document.querySelector('.recommendations-section');
+    if (recommendationsSection) {
+        recommendationsSection.style.display = 'block';
+        // Scroll to recommendations
+        recommendationsSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // Initialize recommendations functionality
+        initializeRecommendationsPage();
+        
+        // Display recommendations based on query
+        displayRecommendations(query);
     }
 }
 
-function initializeBookButton() {
-    const bookBtn = document.querySelector('.book-btn');
+function hideRecommendations() {
+    const recommendationsSection = document.querySelector('.recommendations-section');
+    if (recommendationsSection) {
+        recommendationsSection.style.display = 'none';
+    }
+}
+
+// ===== RECOMMENDATIONS PAGE FUNCTIONALITY =====
+
+// Global variable to store fetched travel data
+let TRAVEL_DATA = null;
+
+function initializeRecommendationsPage() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('q') || '';
     
-    if (!bookBtn) return;
+    // Update search input if it exists on recommendations page
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput && searchQuery) {
+        searchInput.value = searchQuery;
+    }
     
-    bookBtn.addEventListener('click', function() {
-        // Add click animation
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.style.transform = '';
-        }, 150);
+    // Show loading state
+    showLoadingState();
+    
+    // Fetch travel data and initialize page
+    fetchTravelData()
+        .then(() => {
+            // Initialize filtering functionality
+            initializeRecommendationFilters();
+            
+            // Display recommendations based on search query
+            displayRecommendations(searchQuery);
+            
+            // Initialize search functionality on recommendations page
+            initializeRecommendationSearch();
+        })
+        .catch(error => {
+            console.error('Error loading travel data:', error);
+            showErrorState();
+        });
+}
+
+async function fetchTravelData() {
+    try {
+        // Show loading indicator
+        console.log('Loading travel data...');
         
-        // Simulate booking process
-        console.log('Initiating booking process...');
+        const response = await fetch('travel_recommendation_api.json'); // Adjust path as needed
         
-        // You can redirect to booking page or open modal
-        // window.location.href = 'booking.html';
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
-        // Or show a modal/popup
-        showBookingModal();
+        TRAVEL_DATA = await response.json();
+        console.log('Travel data loaded successfully:', TRAVEL_DATA);
+        
+        return TRAVEL_DATA;
+    } catch (error) {
+        console.error('Failed to fetch travel data:', error);
+        
+        // Fallback to sample data if JSON file is not available
+        console.log('Using fallback sample data...');
+        TRAVEL_DATA = getSampleData();
+        
+        return TRAVEL_DATA;
+    }
+}
+
+function getSampleData() {
+    // Fallback sample data in case the JSON file is not available
+    return {
+        "countries": [
+          {
+            "id": 1,
+            "name": "Australia",
+            "cities": [
+              {
+                "name": "Sydney, Australia",
+                "imageUrl": "enter_your_image_for_sydney.jpg",
+                "description": "A vibrant city known for its iconic landmarks like the Sydney Opera House and Sydney Harbour Bridge."
+              },
+              {
+                "name": "Melbourne, Australia",
+                "imageUrl": "enter_your_image_for_melbourne.jpg",
+                "description": "A cultural hub famous for its art, food, and diverse neighborhoods."
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "name": "Japan",
+            "cities": [
+              {
+                "name": "Tokyo, Japan",
+                "imageUrl": "enter_your_image_for_tokyo.jpg",
+                "description": "A bustling metropolis blending tradition and modernity, famous for its cherry blossoms and rich culture."
+              },
+              {
+                "name": "Kyoto, Japan",
+                "imageUrl": "enter_your_image_for_kyoto.jpg",
+                "description": "Known for its historic temples, gardens, and traditional tea houses."
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "name": "Brazil",
+            "cities": [
+              {
+                "name": "Rio de Janeiro, Brazil",
+                "imageUrl": "enter_your_image_for_rio.jpg",
+                "description": "A lively city known for its stunning beaches, vibrant carnival celebrations, and iconic landmarks."
+              },
+              {
+                "name": "São Paulo, Brazil",
+                "imageUrl": "enter_your_image_for_sao-paulo.jpg",
+                "description": "The financial hub with diverse culture, arts, and a vibrant nightlife."
+              }
+            ]
+          }
+        ],
+        "temples": [
+          {
+            "id": 1,
+            "name": "Angkor Wat, Cambodia",
+            "imageUrl": "enter_your_image_for_angkor-wat.jpg",
+            "description": "A UNESCO World Heritage site and the largest religious monument in the world."
+          },
+          {
+            "id": 2,
+            "name": "Taj Mahal, India",
+            "imageUrl": "enter_your_image_for_taj-mahal.jpg",
+            "description": "An iconic symbol of love and a masterpiece of Mughal architecture."
+          }
+        ],
+        "beaches": [
+          {
+            "id": 1,
+            "name": "Bora Bora, French Polynesia",
+            "imageUrl": "enter_your_image_for_bora-bora.jpg",
+            "description": "An island known for its stunning turquoise waters and luxurious overwater bungalows."
+          },
+          {
+            "id": 2,
+            "name": "Copacabana Beach, Brazil",
+            "imageUrl": "enter_your_image_for_copacabana.jpg",
+            "description": "A famous beach in Rio de Janeiro, Brazil, with a vibrant atmosphere and scenic views."
+          }
+        ]
+    };
+}
+
+function initializeRecommendationFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn, .category-filter');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all filter buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Get filter category
+            const category = this.dataset.category || this.dataset.filter || 'all';
+            
+            // Filter and display recommendations
+            filterRecommendations(category);
+        });
     });
 }
 
-function showBookingModal() {
-    // Create a simple modal (you can enhance this)
+function initializeRecommendationSearch() {
+    const searchInput = document.querySelector('.search-input');
+    const searchBtn = document.querySelector('.search-btn');
+    const clearBtn = document.querySelector('.clear-btn');
+    
+    if (searchInput && searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            const query = searchInput.value.trim();
+            displayRecommendations(query);
+            
+            // Update URL without page reload
+            const newUrl = query ? 
+                `${window.location.pathname}?q=${encodeURIComponent(query)}` : 
+                window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+        });
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                displayRecommendations(query);
+                
+                // Update URL without page reload
+                const newUrl = query ? 
+                    `${window.location.pathname}?q=${encodeURIComponent(query)}` : 
+                    window.location.pathname;
+                window.history.replaceState({}, '', newUrl);
+            }
+        });
+    }
+    
+    // Clear button functionality specific to recommendations page
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            clearSearch();
+        });
+    }
+}
+
+function displayRecommendations(searchQuery = '') {
+    const container = document.querySelector('.recommendations-container, .results-container, .destinations-grid');
+    
+    if (!container) {
+        console.warn('Recommendations container not found');
+        return;
+    }
+    
+    // Check if data is loaded
+    if (!TRAVEL_DATA) {
+        showLoadingState();
+        return;
+    }
+    
+    // Get filtered recommendations based on search query
+    const recommendations = getFilteredRecommendations(searchQuery);
+    
+    // Update results count
+    updateResultsCount(recommendations.length, searchQuery);
+    
+    // Clear existing content
+    container.innerHTML = '';
+    
+    if (recommendations.length === 0) {
+        showNoResults(container, searchQuery);
+        return;
+    }
+    
+    // Display recommendations
+    recommendations.forEach((item, index) => {
+        const card = createRecommendationCard(item, index);
+        container.appendChild(card);
+    });
+    
+    // Animate cards appearance
+    animateRecommendationCards();
+}
+
+function getFilteredRecommendations(searchQuery = '') {
+    // Check if data is loaded
+    if (!TRAVEL_DATA) {
+        console.warn('Travel data not loaded yet');
+        return [];
+    }
+    
+    let allRecommendations = [];
+    
+    // Flatten all cities from countries
+    TRAVEL_DATA.countries.forEach(country => {
+        country.cities.forEach(city => {
+            allRecommendations.push({
+                ...city,
+                type: 'city',
+                country: country.name
+            });
+        });
+    });
+    
+    // Add temples
+    TRAVEL_DATA.temples.forEach(temple => {
+        allRecommendations.push({
+            ...temple,
+            type: 'temple'
+        });
+    });
+    
+    // Add beaches
+    TRAVEL_DATA.beaches.forEach(beach => {
+        allRecommendations.push({
+            ...beach,
+            type: 'beach'
+        });
+    });
+    
+    // Filter based on search query
+    if (!searchQuery) {
+        return allRecommendations;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    return allRecommendations.filter(item => {
+        return item.name.toLowerCase().includes(query) ||
+               item.description.toLowerCase().includes(query) ||
+               item.type.toLowerCase().includes(query) ||
+               (item.country && item.country.toLowerCase().includes(query));
+    });
+}
+
+function filterRecommendations(category) {
+    const container = document.querySelector('.recommendations-container, .results-container, .destinations-grid');
+    
+    if (!container) return;
+    
+    // Check if data is loaded
+    if (!TRAVEL_DATA) {
+        showLoadingState();
+        return;
+    }
+    
+    let filteredData = [];
+    
+    switch(category.toLowerCase()) {
+        case 'all':
+            filteredData = getFilteredRecommendations();
+            break;
+        case 'cities':
+        case 'city':
+            TRAVEL_DATA.countries.forEach(country => {
+                country.cities.forEach(city => {
+                    filteredData.push({
+                        ...city,
+                        type: 'city',
+                        country: country.name
+                    });
+                });
+            });
+            break;
+        case 'temples':
+        case 'temple':
+            filteredData = TRAVEL_DATA.temples.map(temple => ({
+                ...temple,
+                type: 'temple'
+            }));
+            break;
+        case 'beaches':
+        case 'beach':
+            filteredData = TRAVEL_DATA.beaches.map(beach => ({
+                ...beach,
+                type: 'beach'
+            }));
+            break;
+        default:
+            filteredData = getFilteredRecommendations();
+    }
+    
+    // Update results count
+    updateResultsCount(filteredData.length, category);
+    
+    // Clear and display filtered results
+    container.innerHTML = '';
+    
+    if (filteredData.length === 0) {
+        showNoResults(container, category);
+        return;
+    }
+    
+    filteredData.forEach((item, index) => {
+        const card = createRecommendationCard(item, index);
+        container.appendChild(card);
+    });
+    
+    // Animate cards
+    animateRecommendationCards();
+}
+
+function createRecommendationCard(item, index) {
+    const card = document.createElement('div');
+    card.className = 'recommendation-card destination-card';
+    card.style.animationDelay = `${index * 0.1}s`;
+    
+    // Use placeholder image if imageUrl contains "enter_your_image"
+    const imageUrl = item.imageUrl.includes('enter_your_image') ? 
+        `https://via.placeholder.com/400x250/4CAF50/white?text=${encodeURIComponent(item.name)}` : 
+        item.imageUrl;
+    
+    card.innerHTML = `
+        <div class="card-image">
+            <img src="${imageUrl}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/400x250/4CAF50/white?text=${encodeURIComponent(item.name)}'">
+            <div class="card-overlay">
+                <span class="card-type">${item.type}</span>
+            </div>
+        </div>
+        <div class="card-content">
+            <h3 class="card-title">${item.name}</h3>
+            <p class="card-description">${item.description}</p>
+            <div class="card-actions">
+                <button class="visit-btn" onclick="handleVisitClick('${item.name}', '${item.type}')">
+                    Visit
+                </button>
+                <button class="learn-more-btn" onclick="showDestinationDetails('${item.name}', '${item.type}')">
+                    Learn More
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Add hover effects
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px) scale(1.02)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+    });
+    
+    return card;
+}
+
+function updateResultsCount(count, searchTerm) {
+    const countElement = document.querySelector('.results-count, .search-results-count');
+    
+    if (countElement) {
+        let message = `Found ${count} result${count !== 1 ? 's' : ''}`;
+        if (searchTerm) {
+            message += ` for "${searchTerm}"`;
+        }
+        countElement.textContent = message;
+    }
+}
+
+function showNoResults(container, searchTerm) {
+    container.innerHTML = `
+        <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <h3>No results found</h3>
+            <p>We couldn't find any destinations matching "${searchTerm}".</p>
+            <p>Try searching for cities, beaches, temples, or countries.</p>
+            <button class="clear-search-btn" onclick="clearSearch()">Clear Search</button>
+        </div>
+    `;
+}
+
+function clearSearch() {
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    // Clear URL parameter
+    window.history.replaceState({}, '', window.location.pathname);
+    
+    // Show all recommendations
+    displayRecommendations();
+    
+    // Reset filter buttons
+    const filterButtons = document.querySelectorAll('.filter-btn, .category-filter');
+    filterButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // Activate "All" filter if it exists
+    const allFilter = document.querySelector('[data-category="all"], [data-filter="all"]');
+    if (allFilter) {
+        allFilter.classList.add('active');
+    }
+}
+
+function animateRecommendationCards() {
+    const cards = document.querySelectorAll('.recommendation-card, .destination-card');
+    
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+}
+
+function handleVisitClick(destinationName, type) {
+    console.log(`Visiting ${destinationName} (${type})`);
+    
+    // Add click animation
+    const clickedButton = event.target;
+    clickedButton.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        clickedButton.style.transform = '';
+    }, 150);
+    
+    // Show visit modal or redirect to booking
+    showVisitModal(destinationName, type);
+}
+
+function showVisitModal(destinationName, type) {
     const modal = document.createElement('div');
     modal.style.cssText = `
         position: fixed;
@@ -247,22 +626,31 @@ function showBookingModal() {
     `;
     
     modalContent.innerHTML = `
-        <h3 style="margin-bottom: 1rem; color: #333;">Booking Coming Soon!</h3>
-        <p style="margin-bottom: 1.5rem; color: #666;">Our booking system will be available soon. Thank you for your interest!</p>
-        <button onclick="this.closest('[style*=position]').remove()" style="
-            background: #00695C;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        ">Close</button>
+        <h3 style="margin-bottom: 1rem; color: #333;">Plan Your Visit</h3>
+        <p style="margin-bottom: 1.5rem; color: #666;">Ready to explore <strong>${destinationName}</strong>?</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button onclick="this.closest('[style*=position]').remove()" style="
+                background: #f5f5f5;
+                color: #333;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+            ">Maybe Later</button>
+            <button onclick="bookDestination('${destinationName}'); this.closest('[style*=position]').remove()" style="
+                background: #00695C;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+            ">Book Now</button>
+        </div>
     `;
     
     modal.appendChild(modalContent);
     document.body.appendChild(modal);
     
-    // Close on outside click
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             modal.remove();
@@ -270,89 +658,18 @@ function showBookingModal() {
     });
 }
 
-function initializeHeroAnimations() {
-    // Add subtle animations to hero elements
-    const heroTitle = document.querySelector('.hero-title');
-    const heroDescription = document.querySelector('.hero-description');
+function showDestinationDetails(destinationName, type) {
+    console.log(`Showing details for ${destinationName} (${type})`);
     
-    if (heroTitle) {
-        // Animate title on load
-        heroTitle.style.opacity = '0';
-        heroTitle.style.transform = 'translateY(30px)';
-        
-        setTimeout(() => {
-            heroTitle.style.transition = 'all 1s ease';
-            heroTitle.style.opacity = '1';
-            heroTitle.style.transform = 'translateY(0)';
-        }, 500);
+    // Find the destination data
+    const destination = findDestinationByName(destinationName);
+    
+    if (!destination) {
+        console.error('Destination not found:', destinationName);
+        return;
     }
     
-    if (heroDescription) {
-        // Animate description on load
-        heroDescription.style.opacity = '0';
-        heroDescription.style.transform = 'translateY(30px)';
-        
-        setTimeout(() => {
-            heroDescription.style.transition = 'all 1s ease';
-            heroDescription.style.opacity = '1';
-            heroDescription.style.transform = 'translateY(0)';
-        }, 800);
-    }
-}
-
-// ===== ABOUT PAGE FUNCTIONALITY =====
-
-function initializeAboutPage() {
-    initializeTeamCards();
-    initializeAboutAnimations();
-}
-
-function initializeTeamCards() {
-    const teamCards = document.querySelectorAll('.team-card');
-    
-    teamCards.forEach((card, index) => {
-        // Add hover effects
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px) scale(1.02)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(-5px) scale(1)';
-        });
-        
-        // Add click functionality to team member roles
-        const roleButton = card.querySelector('.team-member-role');
-        if (roleButton) {
-            roleButton.addEventListener('click', function() {
-                const memberName = card.querySelector('.team-member-name').textContent;
-                const role = this.textContent;
-                
-                showTeamMemberInfo(memberName, role);
-            });
-        }
-        
-        // Animate cards on load
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(50px)';
-        
-        setTimeout(() => {
-            card.style.transition = 'all 0.8s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 200 + (index * 200));
-    });
-}
-
-function showTeamMemberInfo(name, role) {
-    const descriptions = {
-        'John Doe': 'John Doe is our CEO and founder with over 15 years of experience in the travel industry. He leads our company with vision and passion for creating unforgettable travel experiences.',
-        'Celina Thomas': 'Celina Thomas is our Team Lead who coordinates all our travel planning operations. She ensures that every trip is perfectly organized and meets our high standards.',
-        'Mike Tysen': 'Mike Tysen heads our delivery department, making sure all travel arrangements are executed flawlessly and on time. He manages logistics and customer satisfaction.'
-    };
-    
-    const description = descriptions[name] || `Learn more about ${name}, our ${role}.`;
-    
-    // Create info modal
+    // Create details modal
     const modal = document.createElement('div');
     modal.style.cssText = `
         position: fixed;
@@ -365,29 +682,57 @@ function showTeamMemberInfo(name, role) {
         align-items: center;
         justify-content: center;
         z-index: 2000;
+        overflow-y: auto;
     `;
+    
+    const imageUrl = destination.imageUrl.includes('enter_your_image') ? 
+        `https://via.placeholder.com/400x250/4CAF50/white?text=${encodeURIComponent(destination.name)}` : 
+        destination.imageUrl;
     
     const modalContent = document.createElement('div');
     modalContent.style.cssText = `
         background: white;
-        padding: 2rem;
         border-radius: 10px;
-        max-width: 500px;
+        max-width: 600px;
         margin: 20px;
+        overflow: hidden;
     `;
     
     modalContent.innerHTML = `
-        <h3 style="margin-bottom: 0.5rem; color: #333;">${name}</h3>
-        <p style="margin-bottom: 1rem; color: #00695C; font-weight: 600;">${role}</p>
-        <p style="margin-bottom: 1.5rem; color: #666; line-height: 1.6;">${description}</p>
-        <button onclick="this.closest('[style*=position]').remove()" style="
-            background: #00695C;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        ">Close</button>
+        <div style="position: relative;">
+            <img src="${imageUrl}" alt="${destination.name}" 
+                 style="width: 100%; height: 200px; object-fit: cover;"
+                 onerror="this.src='https://via.placeholder.com/600x200/4CAF50/white?text=${encodeURIComponent(destination.name)}'">
+            <button onclick="this.closest('[style*=position]').remove()" 
+                    style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); 
+                           color: white; border: none; border-radius: 50%; width: 30px; height: 30px; 
+                           cursor: pointer;">×</button>
+        </div>
+        <div style="padding: 2rem;">
+            <h2 style="margin-bottom: 0.5rem; color: #333;">${destination.name}</h2>
+            <span style="background: #00695C; color: white; padding: 4px 8px; border-radius: 4px; 
+                         font-size: 0.8rem; text-transform: uppercase;">${type}</span>
+            <p style="margin: 1.5rem 0; color: #666; line-height: 1.6;">${destination.description}</p>
+            
+            <div style="border-top: 1px solid #eee; padding-top: 1.5rem; display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="this.closest('[style*=position]').remove()" style="
+                    background: #f5f5f5;
+                    color: #333;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                ">Close</button>
+                <button onclick="bookDestination('${destination.name}'); this.closest('[style*=position]').remove()" style="
+                    background: #00695C;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                ">Book This Destination</button>
+            </div>
+        </div>
     `;
     
     modal.appendChild(modalContent);
@@ -400,306 +745,147 @@ function showTeamMemberInfo(name, role) {
     });
 }
 
-function initializeAboutAnimations() {
-    const aboutTitle = document.querySelector('.about-title');
-    const teamTitle = document.querySelector('.team-title');
-    const aboutDescription = document.querySelector('.about-description');
+function findDestinationByName(name) {
+    // Check if data is loaded
+    if (!TRAVEL_DATA) {
+        console.warn('Travel data not loaded yet');
+        return null;
+    }
     
-    // Animate elements on scroll or load
-    const animateOnLoad = (element, delay = 0) => {
-        if (!element) return;
-        
-        element.style.opacity = '0';
-        element.style.transform = 'translateX(-50px)';
-        
-        setTimeout(() => {
-            element.style.transition = 'all 1s ease';
-            element.style.opacity = '1';
-            element.style.transform = 'translateX(0)';
-        }, delay);
-    };
-    
-    animateOnLoad(aboutTitle, 300);
-    animateOnLoad(aboutDescription, 600);
-    animateOnLoad(teamTitle, 900);
-}
-
-// ===== CONTACT PAGE FUNCTIONALITY =====
-
-function initializeContactPage() {
-    initializeContactForm();
-    initializeContactAnimations();
-}
-
-function initializeContactForm() {
-    const form = document.getElementById('contactForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const formMessage = document.getElementById('formMessage');
-    
-    if (!form) return;
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(form);
-        const data = {
-            name: formData.get('name').trim(),
-            email: formData.get('email').trim(),
-            message: formData.get('message').trim()
-        };
-        
-        // Validate form
-        if (!validateContactForm(data)) {
-            return;
+    // Search in cities
+    for (const country of TRAVEL_DATA.countries) {
+        const city = country.cities.find(city => city.name === name);
+        if (city) {
+            return { ...city, type: 'city', country: country.name };
         }
-        
-        // Submit form
-        submitContactForm(data);
-    });
+    }
     
-    // Real-time validation
-    const inputs = form.querySelectorAll('.form-input, .form-textarea');
-    inputs.forEach(input => {
-        input.addEventListener('blur', function() {
-            validateField(this);
-        });
-        
-        input.addEventListener('input', function() {
-            clearFieldError(this);
-        });
-    });
+    // Search in temples
+    const temple = TRAVEL_DATA.temples.find(temple => temple.name === name);
+    if (temple) {
+        return { ...temple, type: 'temple' };
+    }
+    
+    // Search in beaches
+    const beach = TRAVEL_DATA.beaches.find(beach => beach.name === name);
+    if (beach) {
+        return { ...beach, type: 'beach' };
+    }
+    
+    return null;
 }
 
-function validateContactForm(data) {
-    let isValid = true;
+function bookDestination(destinationName) {
+    console.log(`Booking ${destinationName}...`);
     
-    // Validate name
-    if (!data.name || data.name.length < 2) {
-        showFieldError('name', 'Name must be at least 2 characters long');
-        isValid = false;
-    }
-    
-    // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!data.email || !emailRegex.test(data.email)) {
-        showFieldError('email', 'Please enter a valid email address');
-        isValid = false;
-    }
-    
-    // Validate message
-    if (!data.message || data.message.length < 10) {
-        showFieldError('message', 'Message must be at least 10 characters long');
-        isValid = false;
-    }
-    
-    return isValid;
+    // Here you would typically redirect to a booking page or open a booking form
+    // For now, we'll show a simple confirmation
+    alert(`Thank you for your interest in ${destinationName}! Our booking system will be available soon.`);
 }
 
-function validateField(field) {
-    const value = field.value.trim();
-    const fieldName = field.name;
-    
-    clearFieldError(field);
-    
-    switch(fieldName) {
-        case 'name':
-            if (!value || value.length < 2) {
-                showFieldError(fieldName, 'Name must be at least 2 characters long');
-                return false;
-            }
-            break;
-        case 'email':
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!value || !emailRegex.test(value)) {
-                showFieldError(fieldName, 'Please enter a valid email address');
-                return false;
-            }
-            break;
-        case 'message':
-            if (!value || value.length < 10) {
-                showFieldError(fieldName, 'Message must be at least 10 characters long');
-                return false;
-            }
-            break;
-    }
-    
-    return true;
-}
+// ===== LOADING AND ERROR STATE FUNCTIONS =====
 
-function showFieldError(fieldName, message) {
-    const field = document.getElementById(fieldName);
-    if (!field) return;
+function showLoadingState() {
+    const container = document.querySelector('.recommendations-container, .results-container, .destinations-grid');
     
-    field.style.borderColor = '#F44336';
+    if (!container) return;
     
-    // Remove existing error message
-    const existingError = field.parentNode.querySelector('.field-error');
-    if (existingError) {
-        existingError.remove();
-    }
-    
-    // Add error message
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'field-error';
-    errorDiv.textContent = message;
-    errorDiv.style.cssText = `
-        color: #F44336;
-        font-size: 0.8rem;
-        margin-top: 5px;
+    container.innerHTML = `
+        <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <h3>Loading destinations...</h3>
+            <p>Please wait while we fetch the latest travel recommendations.</p>
+        </div>
     `;
     
-    field.parentNode.appendChild(errorDiv);
-}
-
-function clearFieldError(field) {
-    field.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+    // Add some basic styling for the loading state
+    const style = document.createElement('style');
+    style.textContent = `
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00695C;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .retry-btn {
+            background: #00695C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .retry-btn:hover {
+            background: #004D40;
+        }
+    `;
     
-    const errorMessage = field.parentNode.querySelector('.field-error');
-    if (errorMessage) {
-        errorMessage.remove();
+    // Only add the style if it doesn't exist
+    if (!document.querySelector('#loading-styles')) {
+        style.id = 'loading-styles';
+        document.head.appendChild(style);
     }
 }
 
-function submitContactForm(data) {
-    const submitBtn = document.getElementById('submitBtn');
-    const formMessage = document.getElementById('formMessage');
+function showErrorState() {
+    const container = document.querySelector('.recommendations-container, .results-container, .destinations-grid');
     
-    // Show loading state
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
+    if (!container) return;
     
-    // Simulate form submission
-    setTimeout(() => {
-        // Reset button
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit';
-        
-        // Show success message
-        showFormMessage('Thank you for your message! We will get back to you soon.', 'success');
-        
-        // Reset form
-        document.getElementById('contactForm').reset();
-        
-        // Here you would typically send data to your server
-        console.log('Form submitted:', data);
-        
-    }, 2000);
+    container.innerHTML = `
+        <div class="error-state">
+            <div class="error-icon">⚠️</div>
+            <h3>Unable to load destinations</h3>
+            <p>We're having trouble loading the travel data. Please check your connection and try again.</p>
+            <button class="retry-btn" onclick="retryLoadingData()">Try Again</button>
+        </div>
+    `;
 }
 
-function showFormMessage(message, type) {
-    const formMessage = document.getElementById('formMessage');
-    if (!formMessage) return;
+function retryLoadingData() {
+    // Show loading state again
+    showLoadingState();
     
-    formMessage.textContent = message;
-    formMessage.className = `form-message ${type}`;
-    formMessage.style.display = 'block';
-    
-    // Hide message after 5 seconds
-    setTimeout(() => {
-        formMessage.style.display = 'none';
-    }, 5000);
-}
-
-function initializeContactAnimations() {
-    const contactTitle = document.querySelector('.contact-title');
-    const contactSubtitle = document.querySelector('.contact-subtitle');
-    const contactForm = document.querySelector('.contact-form');
-    
-    // Animate elements on load
-    if (contactTitle) {
-        contactTitle.style.opacity = '0';
-        contactTitle.style.transform = 'translateX(-50px)';
-        
-        setTimeout(() => {
-            contactTitle.style.transition = 'all 1s ease';
-            contactTitle.style.opacity = '1';
-            contactTitle.style.transform = 'translateX(0)';
-        }, 300);
-    }
-    
-    if (contactSubtitle) {
-        contactSubtitle.style.opacity = '0';
-        contactSubtitle.style.transform = 'translateX(-30px)';
-        
-        setTimeout(() => {
-            contactSubtitle.style.transition = 'all 1s ease';
-            contactSubtitle.style.opacity = '1';
-            contactSubtitle.style.transform = 'translateX(0)';
-        }, 600);
-    }
-    
-    if (contactForm) {
-        contactForm.style.opacity = '0';
-        contactForm.style.transform = 'translateX(50px)';
-        
-        setTimeout(() => {
-            contactForm.style.transition = 'all 1s ease';
-            contactForm.style.opacity = '1';
-            contactForm.style.transform = 'translateX(0)';
-        }, 400);
-    }
-}
-
-// ===== UTILITY FUNCTIONS =====
-
-// Smooth scroll functionality
-function smoothScrollTo(target, duration = 1000) {
-    const targetElement = document.querySelector(target);
-    if (!targetElement) return;
-    
-    const targetPosition = targetElement.offsetTop - 80; // Account for navbar
-    const startPosition = window.pageYOffset;
-    const distance = targetPosition - startPosition;
-    let startTime = null;
-    
-    function animation(currentTime) {
-        if (startTime === null) startTime = currentTime;
-        const timeElapsed = currentTime - startTime;
-        const run = ease(timeElapsed, startPosition, distance, duration);
-        window.scrollTo(0, run);
-        if (timeElapsed < duration) requestAnimationFrame(animation);
-    }
-    
-    function ease(t, b, c, d) {
-        t /= d / 2;
-        if (t < 1) return c / 2 * t * t + b;
-        t--;
-        return -c / 2 * (t * (t - 2) - 1) + b;
-    }
-    
-    requestAnimationFrame(animation);
-}
-
-// Debounce function for performance optimization
-function debounce(func, wait, immediate) {
-    let timeout;
-    return function executedFunction() {
-        const context = this;
-        const args = arguments;
-        const later = function() {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        const callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    };
-}
-
-// Add some performance optimizations
-window.addEventListener('resize', debounce(function() {
-    // Handle responsive adjustments if needed
-    console.log('Window resized');
-}, 250));
-
-// Handle page visibility changes
-document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-        // Page is hidden
-        console.log('Page hidden');
-    } else {
-        // Page is visible
-        console.log('Page visible');
-    }
-});
+    // Retry fetching data
+    fetchTravelData()
+        .then(() => {
+            // Get current search query if any
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('q') || '';
+            
+            // Display recommendations
+            displayRecommendations(searchQuery);
+        })
+        .catch(error => {
+            console.error('Retry failed:', error);
+            showErrorState();
+        });
+};

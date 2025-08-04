@@ -17,9 +17,9 @@
                 <span class="logo-text">Bangaru Travels</span>
             </div>
             <ul class="nav-menu">
-                <li><a href="./index.html" class="nav-link active">Home</a></li>
-                <li><a href="./about.html" class="nav-link">About Us</a></li>
-                <li><a href="./contact.html" class="nav-link">Contact Us</a></li>
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="about.html" class="nav-link">About Us</a></li>
+                <li><a href="contact.html" class="nav-link">Contact Us</a></li>
             </ul>
         </div>
     </nav>
@@ -56,7 +56,7 @@
             <button class="search-btn">Search</button>
             <button class="clear-btn">Clear</button>
         </div>
-        <div class="search-error">Please enter a valid search query.</div>
+        <div class="search-error" style="display: none;">Please enter a valid search query.</div>
 
         <!-- Hero Content -->
         <div class="hero-content">
@@ -70,6 +70,320 @@
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <!-- Recommendations Section (This is where results will be displayed) -->
+    <section class="recommendations-section" style="display: none;">
+        <div class="recommendations-header">
+            <h2 class="section-title">Travel Recommendations</h2>
+            <p class="section-subtitle">Discover amazing destinations based on your search</p>
+            
+            <!-- Secondary Search Bar -->
+            <div class="search-container secondary-search">
+                <input type="text" class="search-input" placeholder="Refine your search">
+                <button class="search-btn">Search</button>
+                <button class="clear-btn">Clear</button>
+            </div>
+            
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">All</button>
+                <button class="filter-btn" data-category="cities">Cities</button>
+                <button class="filter-btn" data-category="beaches">Beaches</button>
+                <button class="filter-btn" data-category="temples">Temples</button>
+            </div>
+            
+            <!-- Results Count -->
+            <div class="results-count"></div>
+        </div>
+        
+        <!-- THIS IS THE MAIN CONTAINER WHERE RECOMMENDATIONS WILL BE DISPLAYED -->
+        <div class="recommendations-container" id="recommendations-grid">
+            <!-- Recommendation cards will be dynamically inserted here by JavaScript -->
+        </div>
+    </section>
+
+    <script src="travel_recommendation.js"></script>
+
+    <style>
+        /* Basic styling for the recommendations section */
+        .recommendations-section {
+            padding: 4rem 2rem;
+            background: transparent;
+            min-height: 100vh;
+        }
+
+        .recommendations-header {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .secondary-search {
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #00695C;
+            background: transparent;
+            color: #00695C;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #00695C;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #00695C;
+            color: white;
+        }
+
+        .results-count {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 2rem;
+        }
+
+        /* MAIN CONTAINER STYLING */
+        .recommendations-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        /* RECOMMENDATION CARD STYLING */
+        .recommendation-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .recommendation-card:hover .card-image img {
+            transform: scale(1.1);
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .card-type {
+            background: rgba(0, 105, 92, 0.9);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-description {
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .visit-btn, .learn-more-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .visit-btn {
+            background: #00695C;
+            color: white;
+        }
+
+        .visit-btn:hover {
+            background: #004D40;
+            transform: translateY(-2px);
+        }
+
+        .learn-more-btn {
+            background: transparent;
+            color: #00695C;
+            border: 2px solid #00695C;
+        }
+
+        .learn-more-btn:hover {
+            background: #00695C;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+            grid-column: 1 / -1;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .clear-search-btn {
+            background: #00695C;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .clear-search-btn:hover {
+            background: #004D40;
+        }
+
+        /* Loading and error states */
+        .loading-state, .error-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00695C;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .retry-btn {
+            background: #00695C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .retry-btn:hover {
+            background: #004D40;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .recommendations-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .filter-buttons {
+                gap: 0.5rem;
+            }
+
+            .filter-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Hide search error initially */
+        .search-error {
+            color: #e53e3e;
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+    </style>
 </body>
 </html>
